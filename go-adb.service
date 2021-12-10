@@ -1,0 +1,27 @@
+# this runs go-adb as a system service. 
+# This file should be put in /etc/systemd/system/go-adb.service on the host machines. 
+# Documentation on all the settings can be found here:
+# https://www.freedesktop.org/software/systemd/man/systemd.service.html
+[Unit]
+Description=go-adb service
+After=network.target
+StartLimitIntervalSec=0
+StartLimitBurst=5
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=adb_user
+ExecStart=/home/adb_user/go-adb/go-adb daemon --procperdevice
+# go-adb does not create a logfile yet, send it to syslog for now
+# see logs with: journalctl -f -t go-adb
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=go-adb
+# need to set a timeout here, shutting go-adb can take a few seconds
+TimeoutSec=60
+
+
+[Install]
+WantedBy=multi-user.target
+
